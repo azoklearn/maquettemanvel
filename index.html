@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manvel_ink - Tatouages Réalistes & Ombrages Profonds</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Roboto+Condensed:wght@300;400;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --black-deep: #0a0a0a;
+            --black-texture: #1a1a1a;
+            --gray-anthracite: #2d2d2d;
+            --gray-medium: #404040;
+            --silver-accent: #c0c0c0;
+            --silver-light: #e8e8e8;
+            --white-soft: #f5f5f5;
+            --shadow-deep: 0 10px 30px rgba(0, 0, 0, 0.8);
+            --shadow-glow: 0 0 20px rgba(192, 192, 192, 0.2);
+        }
+
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+            background: linear-gradient(135deg, var(--black-deep) 0%, var(--black-texture) 50%, var(--gray-anthracite) 100%);
+            color: var(--white-soft);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(192, 192, 192, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(192, 192, 192, 0.02) 0%, transparent 50%),
+                linear-gradient(135deg, var(--black-deep) 0%, var(--black-texture) 100%);
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="texture" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="%23c0c0c0" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23texture)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .logo {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 400;
+            letter-spacing: 0.2em;
+            color: var(--white-soft);
+            text-shadow: 
+                0 0 10px rgba(192, 192, 192, 0.3),
+                0 0 20px rgba(192, 192, 192, 0.2),
+                0 0 30px rgba(192, 192, 192, 0.1);
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 2;
+            animation: glow 3s ease-in-out infinite alternate;
+            text-transform: uppercase;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 
+                    0 0 10px rgba(192, 192, 192, 0.3),
+                    0 0 20px rgba(192, 192, 192, 0.2),
+                    0 0 30px rgba(192, 192, 192, 0.1);
+            }
+            to {
+                text-shadow: 
+                    0 0 15px rgba(192, 192, 192, 0.5),
+                    0 0 25px rgba(192, 192, 192, 0.3),
+                    0 0 35px rgba(192, 192, 192, 0.15);
+            }
+        }
+
+        .tagline {
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            font-weight: 300;
+            color: var(--silver-light);
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 2;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 0.5s forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--silver-accent);
+            font-size: 0.9rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            40% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+            60% {
+                transform: translateX(-50%) translateY(-5px);
+            }
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1001;
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .nav-logo {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: var(--silver-accent);
+            text-decoration: none;
+            letter-spacing: 0.15em;
+            z-index: 1001;
+            text-transform: uppercase;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--white-soft);
+            text-decoration: none;
+            font-weight: 400;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--silver-accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--silver-light);
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 0.5rem;
+            z-index: 1002;
+            position: relative;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--white-soft);
+            margin: 3px 0;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+            background: var(--white-soft);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+            background: var(--white-soft);
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(10, 10, 10, 0.98);
+            backdrop-filter: blur(20px);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .mobile-menu ul {
+            list-style: none;
+            text-align: center;
+        }
+
+        .mobile-menu li {
+            margin: 2rem 0;
+        }
+
+        .mobile-menu a {
+            font-family: 'Orbitron', monospace;
+            color: var(--white-soft);
+            text-decoration: none;
+            font-size: 2rem;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu a:hover {
+            color: var(--silver-accent);
+        }
+
+
+        /* Sections */
+        .section {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 300;
+            color: var(--silver-accent);
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--silver-accent), transparent);
+        }
+
+        /* About Section */
+        .about {
+            background: linear-gradient(135deg, var(--black-texture) 0%, var(--gray-anthracite) 100%);
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--white-soft);
+        }
+
+        .about-text p {
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+
+        .about-text .highlight {
+            color: var(--silver-light);
+            font-weight: 500;
+        }
+
+        .about-image {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow-deep);
+        }
+
+        .about-image img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .about-image:hover img {
+            transform: scale(1.05);
+        }
+
+        .about-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 0%, rgba(192, 192, 192, 0.05) 100%);
+            z-index: 1;
+        }
+
+        /* Gallery Section */
+        .gallery {
+            background: var(--black-deep);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow-deep);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                var(--shadow-deep),
+                var(--shadow-glow);
+            border-color: var(--silver-accent);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        /* Philosophy Section */
+        .philosophy {
+            background: linear-gradient(135deg, var(--gray-anthracite) 0%, var(--black-texture) 100%);
+        }
+
+        .philosophy-content {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .philosophy-text {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: var(--white-soft);
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .philosophy-quote {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--silver-light);
+            font-weight: 500;
+            font-style: italic;
+            margin: 2rem 0;
+            position: relative;
+            line-height: 1.4;
+        }
+
+        .philosophy-quote::before,
+        .philosophy-quote::after {
+            content: '"';
+            font-size: 3rem;
+            color: var(--silver-accent);
+            position: absolute;
+            top: -20px;
+        }
+
+        .philosophy-quote::before {
+            left: -30px;
+        }
+
+        .philosophy-quote::after {
+            right: -30px;
+        }
+
+        /* Contact Section */
+        .contact {
+            background: var(--black-deep);
+            text-align: center;
+        }
+
+        .contact-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .contact-text {
+            font-size: 1.1rem;
+            color: var(--white-soft);
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--silver-accent), var(--silver-light));
+            color: var(--black-deep);
+            padding: 1rem 2.5rem;
+            text-decoration: none;
+            border-radius: 50px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 400;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(192, 192, 192, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(192, 192, 192, 0.3);
+        }
+
+        .contact-info {
+            margin-top: 2rem;
+            color: var(--silver-light);
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--black-texture);
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid var(--gray-anthracite);
+        }
+
+        .footer-text {
+            font-family: 'Orbitron', monospace;
+            color: var(--silver-accent);
+            font-size: 0.9rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .footer-subtext {
+            color: var(--gray-medium);
+            font-size: 0.8rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .section {
+                padding: 4rem 1.5rem;
+            }
+            
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .nav-content {
+                padding: 0 1rem;
+            }
+
+            .header {
+                padding-top: 80px;
+            }
+
+            .logo {
+                font-size: clamp(2.5rem, 6vw, 4rem);
+            }
+
+            .tagline {
+                font-size: clamp(0.9rem, 2vw, 1.2rem);
+                margin-bottom: 1.5rem;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .about-text {
+                font-size: 1rem;
+                text-align: center;
+            }
+
+            .about-image img {
+                height: 300px;
+            }
+
+            .gallery-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .gallery-item img {
+                height: 250px;
+            }
+
+            .section {
+                padding: 3rem 1rem;
+            }
+
+            .section-title {
+                font-size: clamp(2rem, 4vw, 3rem);
+                margin-bottom: 2rem;
+            }
+
+            .philosophy-quote {
+                font-size: 1.2rem;
+                margin: 1.5rem 0;
+            }
+
+            .philosophy-quote::before,
+            .philosophy-quote::after {
+                display: none;
+            }
+
+            .philosophy-text {
+                font-size: 1rem;
+            }
+
+            .cta-button {
+                padding: 0.8rem 2rem;
+                font-size: 1rem;
+            }
+
+            .contact-text {
+                font-size: 1rem;
+            }
+
+            .contact-info {
+                font-size: 0.8rem;
+            }
+
+        }
+
+        @media (max-width: 480px) {
+            .nav-content {
+                padding: 0 0.5rem;
+            }
+
+            .section {
+                padding: 2rem 0.5rem;
+            }
+
+            .logo {
+                font-size: clamp(2rem, 5vw, 3rem);
+            }
+
+            .tagline {
+                font-size: clamp(0.8rem, 1.8vw, 1rem);
+                padding: 0 1rem;
+            }
+
+            .about-text p {
+                margin-bottom: 1rem;
+            }
+
+            .gallery-item img {
+                height: 200px;
+            }
+
+            .philosophy-quote {
+                font-size: 1rem;
+                padding: 0 1rem;
+            }
+
+            .philosophy-text {
+                font-size: 0.9rem;
+                padding: 0 0.5rem;
+            }
+
+            .cta-button {
+                padding: 0.7rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .mobile-menu a {
+                font-size: 1.5rem;
+            }
+
+            .mobile-menu li {
+                margin: 1.5rem 0;
+            }
+        }
+
+        /* Touch optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .gallery-item:hover {
+                transform: none;
+            }
+
+            .gallery-item:active {
+                transform: scale(0.98);
+            }
+
+            .cta-button:hover {
+                transform: none;
+            }
+
+            .cta-button:active {
+                transform: scale(0.95);
+            }
+
+            .nav-links a:hover::after {
+                width: 0;
+            }
+
+            .mobile-menu a:hover {
+                transform: none;
+            }
+
+            .mobile-menu a:active {
+                transform: scale(0.95);
+            }
+        }
+
+        /* Scroll animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-content">
+            <a href="#" class="nav-logo">MANVEL_INK</a>
+            <ul class="nav-links">
+                <li><a href="#accueil">Accueil</a></li>
+                <li><a href="#apropos">À propos</a></li>
+                <li><a href="#galerie">Galerie</a></li>
+                <li><a href="#philosophie">Philosophie</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <ul>
+            <li><a href="#accueil">Accueil</a></li>
+            <li><a href="#apropos">À propos</a></li>
+            <li><a href="#galerie">Galerie</a></li>
+            <li><a href="#philosophie">Philosophie</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </div>
+
+    <!-- Header -->
+    <header class="header" id="accueil">
+        <h1 class="logo">MANVEL_INK</h1>
+        <p class="tagline">Tatoueur réaliste • Black & Grey — Atelier privé</p>
+        <div class="scroll-indicator">↓ Découvrir ↓</div>
+    </header>
+
+    <!-- About Section -->
+    <section class="section about fade-in" id="apropos">
+        <h2 class="section-title">À propos de Manvel_ink</h2>
+        <div class="about-content">
+            <div class="about-text">
+                <p>Je suis <span class="highlight">Manvel</span>, tatoueur réaliste spécialisé en <span class="highlight">Black & Grey</span>.</p>
+                <p>Mon approche est centrée sur la <span class="highlight">précision</span>, la <span class="highlight">profondeur</span> et la <span class="highlight">texture</span>.</p>
+                <p>Chaque pièce est pensée comme une œuvre, travaillée jusqu'à l'émotion.</p>
+                <p>Mon univers : <span class="highlight">contraste</span>, <span class="highlight">lumière</span>, <span class="highlight">ombre</span> et vérité du regard.</p>
+            </div>
+            <div class="about-image">
+                <img src="manvel.png" alt="Manvel - Tatoueur spécialisé en réalisme" onerror="this.style.display='none'">
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="section gallery fade-in" id="galerie">
+        <h2 class="section-title">Portfolio</h2>
+        <div class="gallery-grid">
+            <div class="gallery-item">
+                <img src="tatouage1.png" alt="Création Black & Grey - Manvel_ink" onerror="this.style.display='none'">
+                <div class="gallery-overlay">
+                    <span>Création Black & Grey</span>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="tatouage2.png" alt="Tatouage réaliste - Manvel_ink" onerror="this.style.display='none'">
+                <div class="gallery-overlay">
+                    <span>Tatouage Réaliste</span>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="tatouage3.png" alt="Ombrage profond - Manvel_ink" onerror="this.style.display='none'">
+                <div class="gallery-overlay">
+                    <span>Ombrage Profond</span>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="tatouage4.png" alt="Détail expressif - Manvel_ink" onerror="this.style.display='none'">
+                <div class="gallery-overlay">
+                    <span>Détail Expressif</span>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="tatouage5.png" alt="Texture et réalisme - Manvel_ink" onerror="this.style.display='none'">
+                <div class="gallery-overlay">
+                    <span>Texture & Réalisme</span>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="tatouage6.png" alt="Émotion pure - Manvel_ink" onerror="this.style.display='none'">
+                <div class="gallery-overlay">
+                    <span>Émotion Pure</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Philosophy Section -->
+    <section class="section philosophy fade-in" id="philosophie">
+        <h2 class="section-title">Philosophie & Technique</h2>
+        <div class="philosophy-content">
+            <p class="philosophy-quote">Le tatouage n'est pas qu'une image : c'est une sculpture sur peau.</p>
+            <p class="philosophy-text">Je travaille exclusivement en <span class="highlight">Black & Grey</span>, à la machine rotative, pour un rendu fin et texturé.</p>
+            <p class="philosophy-text">Chaque projet est préparé sur mesure, dans une ambiance concentrée et apaisée.</p>
+            <p class="philosophy-text">Mon objectif : capturer l'essence même de l'émotion à travers l'art du contraste et de l'ombre.</p>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="section contact fade-in" id="contact">
+        <h2 class="section-title">Contact</h2>
+        <div class="contact-content">
+            <p class="contact-text">Prêt à donner vie à votre vision ? Chaque projet commence par une conversation.</p>
+            <a href="https://instagram.com/manvel_ink" class="cta-button" target="_blank">Prendre rendez-vous</a>
+            <p class="contact-info">📍 20 Rue du Général Leclerc, 57390 Audun-le-Tiche</p>
+            <p class="contact-info">Sessions sur rendez-vous uniquement — Contact via Instagram @manvel_ink</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p class="footer-text">© Manvel_ink — Réalisme & Ombres</p>
+        <p class="footer-subtext">Créé avec passion, intensité et précision.</p>
+    </footer>
+
+
+    <script>
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Fade in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+
+        // Mobile menu functionality
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        if (hamburger && mobileMenu) {
+            hamburger.addEventListener('click', function() {
+                hamburger.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+            });
+
+            // Close menu when clicking on links
+            const mobileLinks = mobileMenu.querySelectorAll('a');
+            mobileLinks.forEach(function(link) {
+                link.addEventListener('click', function() {
+                    hamburger.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                });
+            });
+        }
+
+        // Navbar background on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('.nav');
+            if (window.scrollY > 100) {
+                nav.style.background = 'rgba(10, 10, 10, 0.98)';
+            } else {
+                nav.style.background = 'rgba(10, 10, 10, 0.95)';
+            }
+        });
+
+    </script>
+</body>
+</html>
